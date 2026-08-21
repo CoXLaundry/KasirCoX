@@ -1,4 +1,4 @@
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCYJnSNPD8psGmq7vb3e2nDMOi9FP69REPjPscNbbvnNpl8rjQbEt1MYYrmQ-fhLhz/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/u/0/home/projects/1zO1xbpjzR3xnh6M-KuYptyVo1RCE8d3HsECnyClxZ8lA9Z_Po5L5_tkN/edit';
 
 let cashOuts = [],attendances = [], products = [], cart = [], customers = [], transactions = [], usersData = [], currentUser = null, activeCategory = 'Kiloan', saldoAwal = 0;
 

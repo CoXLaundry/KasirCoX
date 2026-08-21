@@ -1,13 +1,13 @@
 {
-  "name": "Purify POS",
-  "short_name": "Purify",
-  "start_url": "/kasir-purify/",
+  "name": "CoX POS",
+  "short_name": "CoX",
+  "start_url": "/CoXLaundry/",
   "display": "standalone",
-  "background_color": "#f4f6f9",
-  "theme_color": "#007770",
+  "background_color": "#000996",
+  "theme_color": "#000996",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "cox_laundry512-01",
       "sizes": "192x192",
       "type": "image/png"
     }
