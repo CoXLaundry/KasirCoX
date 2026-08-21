@@ -1,0 +1,15 @@
+{
+  "name": "Purify POS",
+  "short_name": "Purify",
+  "start_url": "/kasir-purify/",
+  "display": "standalone",
+  "background_color": "#f4f6f9",
+  "theme_color": "#007770",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

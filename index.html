@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Purify POS</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007770">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- LAYAR LOGIN -->
+    <div id="loginScreen" class="login-wrapper">
+        <div class="login-card">
+            <div class="login-logo">P</div>
+            <h2>Purify POS</h2>
+            <p>Sistem Manajemen Laundry</p>
+            <input type="text" id="loginUsername" class="input-field" placeholder="Username">
+            <div style="position: relative; width: 100%; margin-bottom: 10px;">
+    <input type="password" id="loginPin" class="input-field" placeholder="PIN Akses" style="margin-bottom: 0; padding-right: 40px; width: 100%;">
+    <span id="togglePassword" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 16px;">👁️</span>
+</div>
+            <button id="loginBtn" class="btn-primary" style="margin-top: 10px;">Masuk Aplikasi</button>
+            <p id="loginMessage" class="error-text"></p>
+        </div>
+    </div>
+
+    <!-- APLIKASI UTAMA -->
+    <div id="mainApp" style="display: none;">
+        <header class="app-header">
+            <div class="brand-info">
+                <h1>Purify Laundry</h1>
+                <span id="activeUserLabel" class="user-badge">Kasir</span>
+            </div>
+            <div class="header-actions">
+                <button id="logoutBtn" class="icon-btn logout-btn" title="Keluar">⎋</button>
+            </div>
+        </header>
+
+       <!-- 1. HALAMAN UTAMA: DASHBOARD -->
+        <div id="dashboardView" class="view-section active">
+            <div class="dashboard-container">
+                <div class="dashboard-banner">
+                    <h2 id="welcomeGreeting">Halo, Kasir 👋</h2>
+                    <p>Silakan pilih menu operasional di bawah ini:</p>
+                </div>
+
+                <!-- PANEL MONITORING KEUANGAN -->
+                <div id="financeCard" class="finance-card" style="display: none; background: linear-gradient(135deg, var(--primary), #004d47); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0, 119, 112, 0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">
+                        <h3 style="margin: 0; font-size: 15px;">📊 Ringkasan Keuangan</h3>
+                        <button onclick="window.setSaldoAwal()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;">⚙️ Saldo Awal</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <p style="margin: 0; font-size: 12px; opacity: 0.9;">Saldo Aktual (Di Laci)</p>
+                            <h2 id="saldoAktualTxt" style="margin: 5px 0 0 0; font-size: 18px; color: #a7f3d0;">Rp 0</h2>
+                        </div>
+                        <div>
+                            <p style="margin: 0; font-size: 12px; opacity: 0.9;">Saldo Proyeksi (+Piutang)</p>
+                            <h2 id="saldoProyeksiTxt" style="margin: 5px 0 0 0; font-size: 18px; color: #fde68a;">Rp 0</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRID MENU -->
+                <div class="menu-grid">
+                    <div class="menu-card" id="cardPos" onclick="window.switchView('posView')">
+                        <div class="menu-icon">🛒</div><span class="menu-title">Kasir (POS)</span>
+                    </div>
+                    <div class="menu-card" id="cardCashOut" onclick="window.switchView('cashOutView')">
+                        <div class="menu-icon">💸</div><span class="menu-title">Kas Keluar</span>
+                    </div>
+                    <div class="menu-card" id="cardHistory" onclick="window.switchView('historyView')">
+                        <div class="menu-icon">📋</div><span class="menu-title">Riwayat</span>
+                    </div>
+                    <!-- MENU KEUANGAN -->
+                    <div class="menu-card" id="cardFinance" onclick="window.switchView('financeView')">
+                        <div class="menu-icon">📊</div><span class="menu-title">Keuangan</span>
+                    </div>
+                    <div class="menu-card" id="cardAttendance" onclick="window.switchView('attendanceView')">
+    <div class="menu-icon">⏰</div><span class="menu-title">Presensi</span>
+</div>
+                    <div class="menu-card" id="cardAddService" onclick="window.openAddProductModal()">
+                        <div class="menu-icon">➕</div><span class="menu-title">Tambah Layanan</span>
+                    </div>
+                    <div class="menu-card" id="cardSettings" onclick="window.switchView('settingsView')">
+                        <div class="menu-icon">⚙️</div><span class="menu-title">Pengaturan</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. HALAMAN KASIR (FULL FORM) -->
+        <div id="posView" class="view-section" style="display: none; padding-bottom: 100px;">
+            <div class="back-header">
+                <button class="back-btn" onclick="window.switchView('dashboardView')">←</button>
+                <h2>Formulir Transaksi Baru</h2>
+            </div>
+            <div style="padding: 15px; display: flex; flex-direction: column; gap: 15px;">
+                <div class="form-card">
+                    <h3>1. Data Pelanggan</h3>
+                    <input type="text" id="customerName" class="input-field" placeholder="Nama Pelanggan (Ketik untuk cari...)" list="customerList" autocomplete="off">
+                    <datalist id="customerList"></datalist>
+                    <input type="tel" id="customerWA" class="input-field" placeholder="No. WhatsApp (Otomatis jika data ada)">
+                </div>
+                <div class="form-card">
+                    <h3>2. Pilih Layanan</h3>
+                    <div class="category-scroll" style="margin-bottom: 10px;">
+                        <button class="tab-btn active" data-category="Kiloan">Kiloan</button>
+                        <button class="tab-btn" data-category="Satuan">Satuan</button>
+                    </div>
+                    <div class="product-grid" id="productGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 250px; overflow-y: auto; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;"></div>
+                </div>
+                <div class="form-card">
+                    <h3>3. Rincian Pesanan</h3>
+                    <div class="cart-items" id="cartItems"></div>
+                </div>
+                <div class="form-card">
+                    <h3>4. Pembayaran</h3>
+                    <div class="summary-row" style="margin-bottom: 12px;">
+                        <span style="font-size: 13px; font-weight: 600;">Status Pembayaran</span>
+                        <select id="paymentStatus" class="input-field" style="width: 150px; margin-bottom: 0; padding: 8px; font-weight: 600; color: var(--primary);">
+                            <option value="Lunas">Lunas</option><option value="Belum Lunas">Belum Lunas (Nanti)</option>
+                        </select>
+                    </div>
+                    <div class="summary-row"><span>Total Tagihan</span><span id="totalPrice" class="highlight-text">Rp 0</span></div>
+                    <div class="summary-row input-row">
+                        <span>Tunai / Bayar</span>
+                        <div class="input-prefix"><span>Rp</span><input type="number" id="cashGiven" placeholder="0"></div>
+                    </div>
+                    <div class="summary-row divider"><span>Kembalian</span><span id="changeAmount">Rp 0</span></div>
+                </div>
+            </div>
+            <div class="bottom-sticky-bar">
+                <button class="btn-primary" id="checkoutBtn" style="width: 100%; font-size: 15px; padding: 14px;">Selesaikan Transaksi</button>
+            </div>
+        </div>
+
+        <!-- 3. HALAMAN KAS KELUAR -->
+        <div id="cashOutView" class="view-section" style="display: none;">
+            <div class="back-header"><button class="back-btn" onclick="window.switchView('dashboardView')">←</button><h2>Pencatatan Kas Keluar</h2></div>
+            <div style="padding: 20px;">
+                <button id="openCashOutModal" class="btn-primary" style="margin-bottom: 20px;">+ Catat Pengeluaran Baru</button>
+                <div class="history-list" id="cashOutList"></div>
+            </div>
+        </div>
+
+        <!-- 4. HALAMAN RIWAYAT TRANSAKSI -->
+        <div id="historyView" class="view-section" style="display: none;">
+            <div class="back-header"><button class="back-btn" onclick="window.switchView('dashboardView')">←</button><h2>Riwayat Transaksi</h2><button id="refreshHistoryBtn" class="icon-btn" title="Muat Ulang" style="margin-left: auto;">🔄</button></div>
+            <div class="history-list" id="historyList" style="padding: 20px; padding-bottom: 100px;"></div>
+        </div>
+
+        <!-- 5. HALAMAN PENGATURAN AKSES -->
+        <div id="settingsView" class="view-section" style="display: none;">
+            <div class="back-header"><button class="back-btn" onclick="window.switchView('dashboardView')">←</button><h2>Pengaturan Pengguna</h2></div>
+            <div style="padding: 20px;">
+                <button onclick="document.getElementById('addUserModal').style.display='flex'" class="btn-primary" style="margin-bottom: 20px;">+ Tambah Pengguna</button>
+                <div class="history-list" id="userList"></div>
+            </div>
+        </div>
+
+        <!-- 6. HALAMAN LAPORAN KEUANGAN (BARU) -->
+        <div id="financeView" class="view-section" style="display: none;">
+            <div class="back-header"><button class="back-btn" onclick="window.switchView('dashboardView')">←</button><h2>Laporan Keuangan Detail</h2></div>
+            <div style="padding: 20px; padding-bottom: 100px;">
+                
+                <div class="form-card" style="margin-bottom: 15px;">
+                    <h3>Buku Kas (Uang di Laci)</h3>
+                    <div class="summary-row"><span>Saldo Awal</span><span id="detailSaldoAwal">Rp 0</span></div>
+                    <div class="summary-row"><span>Pemasukan Lunas</span><span id="detailPemasukan" style="color:var(--primary);">Rp 0</span></div>
+                    <div class="summary-row"><span>Pengeluaran Kas</span><span id="detailPengeluaran" style="color:var(--danger);">Rp 0</span></div>
+                    <div class="summary-row divider"><span>Total Saldo Aktual</span><span id="detailSaldoAktual" class="highlight-text">Rp 0</span></div>
+                </div>
+
+                <div class="form-card" style="margin-bottom: 20px;">
+                    <h3>Piutang & Proyeksi</h3>
+                    <div class="summary-row"><span>Piutang (Belum Lunas)</span><span id="detailPiutang" style="color:#f59e0b;">Rp 0</span></div>
+                    <div class="summary-row divider"><span>Total Saldo Proyeksi</span><span id="detailSaldoProyeksi" class="highlight-text">Rp 0</span></div>
+                </div>
+
+                <h3 style="font-size: 15px; color: var(--text-main); margin-bottom: 15px;">Riwayat Arus Kas</h3>
+                <div id="cashFlowList" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Data arus kas akan dirender via JS -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MODALS -->
+        <!-- Modal Tambah Layanan -->
+        <div id="addProductModal" class="modal-overlay" style="display: none;">
+            <div class="modal-card">
+                <h3>Tambah Layanan</h3>
+                <div class="input-group"><label>Nama Layanan</label><input type="text" id="newProductName"></div>
+                <div class="input-group"><label>Harga (Rp)</label><input type="number" id="newProductPrice"></div>
+                <div class="input-group">
+                    <label>Kategori</label>
+                    <select id="newProductCategory"><option value="Kiloan">Cuci Kiloan</option><option value="Satuan">Cuci Satuan</option></select>
+                </div>
+                <div class="modal-actions">
+                    <button id="cancelAddBtn" class="btn-text">Batal</button>
+                    <button id="saveProductBtn" class="btn-primary-small">Simpan</button>
+                </div>
+            </div>
+        </div>
+       
+        <!-- Modal Kas Keluar -->
+        <div id="cashOutModal" class="modal-overlay" style="display: none;">
+            <div class="modal-card">
+                <h3>Form Kas Keluar</h3>
+                <div class="input-group"><label>Keterangan Pengeluaran</label><input type="text" id="coDescription"></div>
+                <div class="input-group"><label>Jumlah Nominal (Rp)</label><input type="number" id="coAmount"></div>
+                <div class="modal-actions">
+                    <button id="cancelCoBtn" class="btn-text">Batal</button>
+                    <button id="saveCoBtn" class="btn-primary-small">Simpan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL TAMBAH PENGGUNA -->
+        <div id="addUserModal" class="modal-overlay" style="display: none;">
+            <div class="modal-card" style="max-height: 90vh; overflow-y: auto;">
+                <h3>Tambah Pengguna & Hak Akses</h3>
+                <div class="input-group"><label>Username</label><input type="text" id="newUsername" placeholder="Cth: kasir_satu"></div>
+                <div class="input-group"><label>PIN Akses (Angka)</label><input type="number" id="newUserPin" placeholder="Cth: 123456"></div>
+                <div class="input-group">
+                    <label>Peran (Role Label)</label>
+                    <input type="text" id="newUserRole" value="Kasir" placeholder="Cth: Kasir / Staff">
+                </div>
+               
+                <div class="input-group" style="margin-top: 15px;">
+                    <label style="font-weight: 700; color: var(--primary); margin-bottom: 8px; display: block;">Pilih Menu yang Diizinkan:</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;"><input type="checkbox" class="perm-checkbox" value="pos" checked> 🛒 Akses Kasir (POS)</label>
+                        <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;"><input type="checkbox" class="perm-checkbox" value="cash_out"> 💸 Akses Kas Keluar</label>
+                        <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;"><input type="checkbox" class="perm-checkbox" value="history" checked> 📋 Akses Riwayat Transaksi</label>
+                        <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;"><input type="checkbox" class="perm-checkbox" value="finance"> 📊 Akses Laporan Keuangan</label>
+                        <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;"><input type="checkbox" class="perm-checkbox" value="catalog"> ➕ Akses Tambah/Hapus Layanan</label>
+                        <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;"><input type="checkbox" class="perm-checkbox" value="settings"> ⚙️ Akses Pengaturan Akses</label>
+                    </div>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 15px;">
+                    <button onclick="document.getElementById('addUserModal').style.display='none'" class="btn-text">Batal</button>
+                    <button id="saveUserBtn" class="btn-primary-small">Simpan Pengguna</button>
+                </div>
+            </div>
+        </div>
+       
+        <!-- Modal Edit Pengguna -->
+        <div id="editUserModal" class="modal-overlay" style="display: none;">
+            <div class="modal-card">
+                <h3>Edit Akses: <span id="editUserLabel"></span></h3>
+                <input type="hidden" id="editUsername">
+                <div class="input-group"><label>PIN Baru</label><input type="number" id="editUserPin"></div>
+                <div class="input-group"><label>Peran</label><input type="text" id="editUserRole"></div>
+                <div class="input-group">
+                    <label>Pilih Menu:</label>
+                    <div id="editPermissionsContainer" style="display: flex; flex-direction: column; gap: 5px;">
+                        <!-- Checkbox akan dimuat via JS -->
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="document.getElementById('editUserModal').style.display='none'" class="btn-text">Batal</button>
+                    <button id="updateUserBtn" class="btn-primary-small">Update Akses</button>
+                </div>
+            </div>
+        </div>
+        <!-- HALAMAN PRESENSI KARYAWAN -->
+<div id="attendanceView" class="view-section" style="display: none;">
+    <div class="back-header">
+        <button class="back-btn" onclick="window.switchView('dashboardView')">←</button>
+        <h2>Presensi Karyawan</h2>
+    </div>
+    <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 100px;">
+        <div class="form-card" style="text-align: center; padding: 25px;">
+            <h3 id="attendanceUserGreeting" style="margin-bottom: 5px;">Halo</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Silakan catat kehadiran Anda hari ini</p>
+            <div id="liveClock" style="font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 20px;">00:00:00</div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button id="clockInBtn" class="btn-primary" style="flex: 1; background: #0f766e;">Masuk (Clock In)</button>
+                <button id="clockOutBtn" class="btn-primary" style="flex: 1; background: #b91c1c;">Pulang (Clock Out)</button>
+            </div>
+        </div>
+
+        <h3 style="font-size: 15px; margin-top: 10px;">Riwayat Presensi</h3>
+        <div class="history-list" id="attendanceList">
+            <!-- Data presensi akan dimuat di sini -->
+        </div>
+    </div>
+</div>
+    <script src="script.js"></script>
+</body>
+</html>
